@@ -5,15 +5,14 @@ use std::sync::{Arc, Mutex};
 
 use amethyst::assets::{AssetStorage, Directory, Handle, Loader, ProgressCounter, Source};
 use amethyst::core::math::Point3;
-use amethyst::ecs::World;
-
+use amethyst::ecs::{Component, VecStorage};
 use amethyst::error::Error;
 use amethyst::renderer::rendy::{
     hal::image::{Filter, Kind, SamplerInfo, ViewKind, WrapMode},
     texture::{pixel::AsPixel, pixel::Rgba8Srgb, TextureBuilder},
 };
 use amethyst::renderer::{SpriteSheet, Texture};
-use amethyst::tiles::Tile;
+use amethyst::{shred::World, tiles::Tile};
 use sheep::{encode, SpriteSheet as PackedSpriteSheet};
 use tiled::{parse_tileset, Tileset};
 
@@ -29,7 +28,14 @@ use packing::AmethystOrderedFormat;
 
 pub use format::TiledFormat;
 pub use prefab::*;
-pub use strategy::{CompressedLoad, FlatLoad, StaticLoad};
+pub use strategy::{CompressedLoad, FlatLoad};
+
+#[derive(Debug, Clone)]
+pub struct MapContainer(pub Box<tiled::Map>);
+
+impl Component for MapContainer {
+    type Storage = VecStorage<Self>;
+}
 
 /// The grid id of a tile
 #[repr(transparent)]

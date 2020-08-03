@@ -150,8 +150,7 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for CompressedLoad<E> {
         for layer in &map.layers {
             for y in 0..layer.tiles.len() {
                 for x in 0..layer.tiles[y].len() {
-                    let tile_ref =
-                        tilemap.get_mut(&Point3::new(x as u32, y as u32, layer.layer_index));
+                    let tile_ref = tilemap.get_mut(&Point3::new(x as u32, y as u32, layer.layer_index));
                     let tile_idx = gid_updater.get(&layer.tiles[y][x].gid);
 
                     match (tile_ref, tile_idx) {

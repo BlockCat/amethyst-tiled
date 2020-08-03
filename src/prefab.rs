@@ -5,7 +5,8 @@ use amethyst::Error;
 use tiled::{Map, Tileset};
 
 use crate::strategy::{CompressedLoad, LoadStrategy, StrategyDesc};
-use crate::{load_tileset_inner, Tilesets};
+use crate::{load_tileset_inner, Tilesets, MapContainer};
+
 use std::sync::Arc;
 
 #[cfg(feature = "profiler")]
@@ -69,7 +70,7 @@ impl<'a> PrefabData<'a> for TileSetPrefab {
 }
 
 pub enum TileMapPrefab<S: StrategyDesc = CompressedLoad> {
-    Result(S::Result),
+    Result(S::Result, MapContainer),
     Map(Map, Arc<dyn Source>),
 }
 
@@ -77,7 +78,7 @@ impl<'a, T: LoadStrategy<'a>> PrefabData<'a> for TileMapPrefab<T>
 where
     T::Result: Clone + Component + Asset,
 {
-    type SystemData = (T::SystemData, WriteStorage<'a, <T as StrategyDesc>::Result>);
+    type SystemData = (T::SystemData, WriteStorage<'a, <T as StrategyDesc>::Result>, WriteStorage<'a, MapContainer>);
 
     // Don't use a result due to the requirement of cloning the tilemap extra times
     type Result = ();
@@ -92,11 +93,12 @@ where
         #[cfg(feature = "profiler")]
         profile_scope!("add_tilemap_to_entity");
 
-        let (_, storage) = system_data;
+        let (_, storage, map_storage) = system_data;
 
         match self {
-            TileMapPrefab::Result(v) => {
+            TileMapPrefab::Result(v, map) => {
                 storage.insert(entity, v.clone())?;
+                map_storage.insert(entity, map.clone())?;
                 Ok(())
             }
             _ => unreachable!("load_sub_assets should be called before add_to_entity"),
@@ -112,7 +114,7 @@ where
         profile_scope!("load_tilemap_assets");
         match self {
             TileMapPrefab::Map(map, source) => {
-                *self = Self::Result(T::load(map, source.clone(), progress, &mut system_data.0)?);
+                *self = Self::Result(T::load(map, source.clone(), progress, &mut system_data.0)?, MapContainer(Box::new(map.clone())));
                 Ok(true)
             }
             _ => Ok(false),
