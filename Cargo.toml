@@ -11,12 +11,12 @@ profiler = ["thread_profiler", "amethyst/profiler"]
 [dependencies]
 tiled = { git = "https://github.com/jmeggitt/rs-tiled.git" }
 sheep = "0.3.0"
-image = "0.22"
-amethyst = "0.13"
+image = "0.23.8"
+amethyst = { git = "https://github.com/amethyst/amethyst.git", rev ="32b441fba0f992408684043be70e7241722357da", features = ["tiles"] }
 thread_profiler = {version = "0.3", optional = true }
 
 [dev-dependencies]
-log = { version = "0.4.6", features = ["serde"] }
+log = { version = "0.4.11", features = ["serde"] }
 
 [[example]]
 name = "concept"

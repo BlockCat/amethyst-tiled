@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use amethyst::assets::{Format, FormatValue, Prefab, SingleFile, Source};
 use amethyst::Error;
-use image::{load_from_memory, DynamicImage, ImageError, RgbaImage};
+use image::{load_from_memory, DynamicImage, RgbaImage};
 use tiled::{parse, parse_tileset, TilesetRef};
 
 use crate::prefab::TileMapPrefab;
@@ -53,7 +53,10 @@ impl<T: 'static + StrategyDesc> Format<TileMapPrefab<T>> for TiledFormat {
 
         let mut map = match parse(&b[..]) {
             Ok(v) => v,
-            Err(e) => return Err(Error::new(e)),
+            Err(e) => {
+                dbg!(&e);
+                return Err(Error::new(e));
+            }
         };
 
         for tileset in &mut map.tilesets {
@@ -90,7 +93,10 @@ impl Format<RgbaImage> for TiledFormat {
     fn import_simple(&self, bytes: Vec<u8>) -> Result<RgbaImage, Error> {
         match load_from_memory(&bytes[..])? {
             DynamicImage::ImageRgba8(v) => Ok(v),
-            _ => Err(ImageError::FormatError("Unable to read non rgba8 images".to_owned()).into()),
+            // _ => Err(ImageError::),
+            _ => Err(Error::from_string(
+                "Unable to read non rgba8 images".to_owned(),
+            )),
         }
     }
 }

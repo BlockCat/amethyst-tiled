@@ -61,7 +61,10 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for FlatLoad<E> {
         let (loader, storage, sheets) = system_data;
 
         let packed = pack_tileset_vec(
-            &map.tilesets.iter().map(|x| x.unwrap().clone()).collect::<Vec<Tileset>>()[..],
+            &map.tilesets
+                .iter()
+                .map(|x| x.unwrap().clone())
+                .collect::<Vec<Tileset>>()[..],
             source,
         )?;
 
@@ -75,7 +78,11 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for FlatLoad<E> {
             for y in 0..layer.tiles.len() {
                 for x in 0..layer.tiles[y].len() {
                     match tilemap.get_mut(&Point3::new(x as u32, y as u32, layer.layer_index)) {
-                        Some(v) => *v = TileGid(layer.tiles[y][x].gid as usize),
+                        Some(v) => {
+                            *v = TileGid {
+                                gid: layer.tiles[y][x].gid as usize,
+                            }
+                        }
                         None => unreachable!("The map file was corrupt"),
                     }
                 }
@@ -126,7 +133,10 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for CompressedLoad<E> {
         }
 
         let packed = pack_sparse_tileset_vec(
-            &map.tilesets.iter().map(|x| x.unwrap().clone()).collect::<Vec<Tileset>>()[..],
+            &map.tilesets
+                .iter()
+                .map(|x| x.unwrap().clone())
+                .collect::<Vec<Tileset>>()[..],
             source,
             &tile_usage[..],
         )?;
@@ -145,7 +155,7 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for CompressedLoad<E> {
                     let tile_idx = gid_updater.get(&layer.tiles[y][x].gid);
 
                     match (tile_ref, tile_idx) {
-                        (Some(tile), Some(index)) => *tile = TileGid(*index),
+                        (Some(tile), Some(index)) => *tile = TileGid {gid: *index},
                         _ => unreachable!("The available tiles should not have changed since the start of the function"),
                     }
                 }

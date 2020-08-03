@@ -6,6 +6,7 @@ use amethyst::{
     prelude::*,
     renderer::{
         camera::{ActiveCamera, Camera},
+        rendy::hal::command::ClearColor,
         types::DefaultBackend,
         RenderToWindow, RenderingBundle,
     },
@@ -103,7 +104,8 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
-                    RenderToWindow::from_config_path(display_config_path).with_clear([1.0; 4]),
+                    RenderToWindow::from_config_path(display_config_path)?
+                        .with_clear(ClearColor::Sfloat([0.149, 0.149, 0.0, 1.0])),
                 )
                 .with_plugin(RenderTiles2D::<TileGid, FlatEncoder>::default()),
         )?;

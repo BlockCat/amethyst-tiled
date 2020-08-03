@@ -34,17 +34,19 @@ pub use strategy::{CompressedLoad, FlatLoad, StaticLoad};
 /// The grid id of a tile
 #[repr(transparent)]
 #[derive(Copy, Clone, Hash, Default)]
-pub struct TileGid(usize);
+pub struct TileGid {
+    gid: usize,
+}
 
 impl From<usize> for TileGid {
     fn from(idx: usize) -> Self {
-        Self(idx)
+        Self { gid: idx }
     }
 }
 
 impl Tile for TileGid {
     fn sprite(&self, _: Point3<u32>, _: &World) -> Option<usize> {
-        Some(self.0)
+        Some(self.gid)
     }
 }
 
