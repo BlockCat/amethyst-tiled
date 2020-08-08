@@ -152,11 +152,17 @@ impl<'a, E: CoordinateEncoder> LoadStrategy<'a> for CompressedLoad<E> {
                 for x in 0..layer.tiles[y].len() {
                     let tile_ref = tilemap.get_mut(&Point3::new(x as u32, y as u32, layer.layer_index));
                     let tile_idx = gid_updater.get(&layer.tiles[y][x].gid);
+                    if let Some(index) = tile_idx {
+                        if index > &0 {
 
-                    match (tile_ref, tile_idx) {
-                        (Some(tile), Some(index)) => *tile = TileGid {gid: *index},
-                        _ => unreachable!("The available tiles should not have changed since the start of the function"),
+                            match tile_ref {
+                                Some(tile) => *tile = TileGid {gid: *index},
+                                _ => {}
+                                // _ => unreachable!("The available tiles should not have changed since the start of the function"),
+                            }
+                        }
                     }
+                    
                 }
             }
         }

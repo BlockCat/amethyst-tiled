@@ -39,7 +39,7 @@ impl Component for MapContainer {
 
 /// The grid id of a tile
 #[repr(transparent)]
-#[derive(Copy, Clone, Hash, Default)]
+#[derive(Debug, Copy, Clone, Hash, Default)]
 pub struct TileGid {
     gid: usize,
 }
